@@ -1,40 +1,34 @@
 'use client'
 
-// ── StatsRow ────────────────────────────────────────────────
+import { useState } from 'react'
+import { UITJE_TYPES, type UitjeType, type UserProfile } from '@/types'
+
+const B1 = 'rgba(28,21,16,0.08)'
+const B2 = 'rgba(28,21,16,0.14)'
+const AMBER = '#FF6B2B'
+const INK = '#1C1510'
+const INK2 = '#3A2E26'
+const MUTED = '#8A7D72'
+const MUTED2 = '#BFB5AC'
+const S1 = '#FFFFFF'
+const S2 = '#F2EDE8'
+
+// ── StatsRow ─────────────────────────────────────────────────
 export function StatsRow() {
   const stats = [
-    { n: '847+', label: 'Actieve leden' },
-    { n: '24–50', label: 'Leeftijdscategorie' },
-    { n: 'NL', label: 'Heel Nederland' },
-    { n: '12+', label: 'Type uitjes' },
+    { n: '847', suffix: '+', label: 'Actieve leden' },
+    { n: '24–50', suffix: '', label: 'Leeftijdscategorie' },
+    { n: 'NL', suffix: '', label: 'Heel Nederland' },
+    { n: '12', suffix: '+', label: 'Type uitjes' },
   ]
-
   return (
-    <div
-      className="flex border-y"
-      style={{
-        background: '#151C27',
-        borderColor: 'rgba(238,240,244,0.07)',
-      }}
-    >
+    <div style={{ display: 'flex', borderTop: `1.5px solid ${B1}`, borderBottom: `1.5px solid ${B1}`, background: S1 }}>
       {stats.map((s, i) => (
-        <div
-          key={s.label}
-          className="flex-1 px-8 py-5 border-r last:border-r-0"
-          style={{ borderColor: 'rgba(238,240,244,0.07)' }}
-        >
-          <div className="font-display text-3xl tracking-wide text-fp-white leading-none">
-            {s.n.includes('+') ? (
-              <>{s.n.replace('+', '')}<span className="text-fp-red">+</span></>
-            ) : s.n.includes('–') ? (
-              <>{s.n.split('–')[0]}<span className="text-fp-red">–</span>{s.n.split('–')[1]}</>
-            ) : (
-              s.n
-            )}
+        <div key={s.label} style={{ flex: 1, padding: '1.25rem 2rem', borderRight: i < stats.length - 1 ? `1px solid ${B1}` : 'none' }}>
+          <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '2rem', letterSpacing: '1px', color: INK, lineHeight: 1 }}>
+            {s.n}<span style={{ color: AMBER }}>{s.suffix}</span>
           </div>
-          <div className="font-mono text-[10px] tracking-widest uppercase text-fp-muted mt-1">
-            {s.label}
-          </div>
+          <div style={{ fontSize: '0.68rem', fontWeight: 500, letterSpacing: '0.8px', textTransform: 'uppercase', color: MUTED, marginTop: '3px' }}>{s.label}</div>
         </div>
       ))}
     </div>
@@ -42,25 +36,16 @@ export function StatsRow() {
 }
 
 // ── TickerBanner ─────────────────────────────────────────────
-const TICKER_ITEMS = [
-  'Techno', 'Theater', 'Concert', 'Festival', 'Film',
-  'Museum', 'Sport', 'Bar', 'Expo', 'Dance', 'Opera', 'Comedy',
-]
+const ITEMS = ['Techno', 'Theater', 'Concert', 'Festival', 'Film', 'Museum', 'Sport', 'Bar', 'Expo', 'Comedy']
 
 export function TickerBanner() {
-  const items = [...TICKER_ITEMS, ...TICKER_ITEMS]
-
+  const doubled = [...ITEMS, ...ITEMS]
   return (
-    <div
-      className="overflow-hidden border-b py-2.5"
-      style={{ background: '#151C27', borderColor: 'rgba(238,240,244,0.07)' }}
-    >
-      <div className="flex whitespace-nowrap animate-ticker">
-        {items.map((item, i) => (
-          <span key={i} className="font-mono text-[11px] tracking-widest uppercase px-8">
-            <span className="text-fp-muted">{item}</span>
-            {' '}
-            <span className="text-fp-red">·</span>
+    <div style={{ overflow: 'hidden', borderBottom: `1.5px solid ${B1}`, padding: '0.65rem 0', background: S2 }}>
+      <div className="animate-ticker" style={{ display: 'flex', whiteSpace: 'nowrap', width: 'max-content' }}>
+        {doubled.map((item, i) => (
+          <span key={i} style={{ fontSize: '0.7rem', fontWeight: 600, letterSpacing: '1.5px', textTransform: 'uppercase', padding: '0 2rem', color: MUTED }}>
+            {item} <span style={{ color: AMBER }}>·</span>
           </span>
         ))}
       </div>
@@ -69,134 +54,77 @@ export function TickerBanner() {
 }
 
 // ── FilterBar ────────────────────────────────────────────────
-import { useState } from 'react'
-import { UITJE_TYPES, type UitjeType } from '@/types'
-
 interface FilterBarProps {
   activeFilter: UitjeType | 'all'
-  onFilter: (filter: UitjeType | 'all') => void
+  onFilter: (f: UitjeType | 'all') => void
 }
 
 export function FilterBar({ activeFilter, onFilter }: FilterBarProps) {
   return (
-    <div className="flex flex-wrap gap-2 px-8 py-7 max-w-5xl mx-auto">
-      <button
-        onClick={() => onFilter('all')}
-        className="font-mono text-[11px] tracking-wide uppercase px-4 py-1.5 border transition-colors"
-        style={activeFilter === 'all'
-          ? { background: '#EEF0F4', color: '#0E121A', borderColor: '#EEF0F4' }
-          : { background: 'transparent', color: '#6B7590', borderColor: 'rgba(238,240,244,0.13)' }
-        }
-      >
-        Alles
-      </button>
-      {UITJE_TYPES.map((t) => (
-        <button
-          key={t.value}
-          onClick={() => onFilter(t.value)}
-          className="font-mono text-[11px] tracking-wide uppercase px-4 py-1.5 border transition-colors"
-          style={activeFilter === t.value
-            ? { background: '#EEF0F4', color: '#0E121A', borderColor: '#EEF0F4' }
-            : { background: 'transparent', color: '#6B7590', borderColor: 'rgba(238,240,244,0.13)' }
-          }
-        >
-          {t.label}
-        </button>
-      ))}
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', padding: '1.75rem 2rem', maxWidth: '980px', margin: '0 auto' }}>
+      {[{ value: 'all' as const, label: 'Alles' }, ...UITJE_TYPES.map(t => ({ value: t.value, label: t.label }))].map(tag => {
+        const active = activeFilter === tag.value
+        return (
+          <button key={tag.value} onClick={() => onFilter(tag.value)} style={{
+            fontSize: '0.73rem', fontWeight: 500, padding: '0.4rem 1rem',
+            background: active ? INK : S1,
+            border: `1.5px solid ${active ? INK : B1}`,
+            color: active ? '#FAF7F4' : MUTED,
+            cursor: 'pointer', borderRadius: '100px', transition: 'all 0.2s',
+          }}>{tag.label}</button>
+        )
+      })}
     </div>
   )
 }
 
-// ── ProfielCard ──────────────────────────────────────────────
-import type { UserProfile } from '@/types'
-
-interface ProfielCardProps {
-  profiel: Pick<UserProfile, 'id' | 'naam' | 'leeftijd' | 'woonplaats' | 'bio' | 'situatie' | 'uitje_types'>
-  online?: boolean
-}
-
-const AVATAR_COLORS = [
-  { bg: '#232E42', text: '#ff6b6b', border: 'rgba(255,107,107,0.2)' },
-  { bg: '#232E42', text: '#ffd166', border: 'rgba(255,209,102,0.2)' },
-  { bg: '#232E42', text: '#a29bfe', border: 'rgba(162,155,254,0.2)' },
-  { bg: '#232E42', text: '#74b9ff', border: 'rgba(116,185,255,0.2)' },
-  { bg: '#232E42', text: '#55efc4', border: 'rgba(85,239,196,0.2)' },
+// ── Avatar colours ────────────────────────────────────────────
+const AV = [
+  { bg: '#FDEEE6', color: '#C04A1A', border: 'rgba(192,74,26,0.15)' },
+  { bg: '#E6F5EE', color: '#1A7A4A', border: 'rgba(26,122,74,0.15)' },
+  { bg: '#EEE6FD', color: '#5B1AC0', border: 'rgba(91,26,192,0.15)' },
+  { bg: '#E6EEFF', color: '#1A3AC0', border: 'rgba(26,58,192,0.15)' },
+  { bg: '#FDF5E6', color: '#C07A1A', border: 'rgba(192,122,26,0.15)' },
 ]
 
-function getAvatarColor(naam: string) {
-  const idx = naam.charCodeAt(0) % AVATAR_COLORS.length
-  return AVATAR_COLORS[idx]
-}
+// ── ProfielCard ──────────────────────────────────────────────
+type CardProfile = Pick<UserProfile, 'id' | 'naam' | 'leeftijd' | 'woonplaats' | 'bio' | 'situatie' | 'uitje_types'>
+const SITUATIE_LABELS: Record<string, string> = { single: 'Single', relatie: 'In relatie', getrouwd: 'Getrouwd', liever_niet_zeggen: '—' }
+const UITJE_MAP = Object.fromEntries(UITJE_TYPES.map(t => [t.value, t.label]))
 
-export function ProfielCard({ profiel, online }: ProfielCardProps) {
-  const initials = profiel.naam.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()
-  const color = getAvatarColor(profiel.naam)
-  const topTypes = profiel.uitje_types.slice(0, 2)
-  const UITJE_LABELS = Object.fromEntries(UITJE_TYPES.map((t) => [t.value, t.label]))
-
-  const SITUATIE_LABELS: Record<string, string> = {
-    single: 'Single',
-    relatie: 'In relatie',
-    getrouwd: 'Getrouwd',
-    liever_niet_zeggen: '—',
-  }
+export function ProfielCard({ profiel, online }: { profiel: CardProfile; online?: boolean }) {
+  const initials = profiel.naam.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+  const av = AV[profiel.naam.charCodeAt(0) % AV.length]
+  const [hovered, setHovered] = useState(false)
 
   return (
     <div
-      className="relative p-5 cursor-pointer transition-colors group"
-      style={{ background: '#151C27', border: '1px solid rgba(238,240,244,0.07)' }}
-      onMouseEnter={(e) => (e.currentTarget.style.background = '#1C2535')}
-      onMouseLeave={(e) => (e.currentTarget.style.background = '#151C27')}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        background: S1, padding: '1.4rem', cursor: 'pointer',
+        borderRadius: '12px', border: `1.5px solid ${hovered ? B2 : B1}`,
+        transform: hovered ? 'translateY(-2px)' : 'none',
+        boxShadow: hovered ? '0 6px 24px rgba(28,21,16,0.07)' : 'none',
+        transition: 'all 0.2s',
+      }}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div
-          className="w-10 h-10 flex items-center justify-center font-display text-sm tracking-wide"
-          style={{ background: color.bg, color: color.text, border: `1px solid ${color.border}` }}
-        >
-          {initials}
-        </div>
-        {online && (
-          <span className="font-mono text-[10px] tracking-wide flex items-center gap-1" style={{ color: '#4cde80' }}>
-            <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: '#4cde80' }} />
-            Online
-          </span>
-        )}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+        <div style={{ width: '40px', height: '40px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Bebas Neue', sans-serif", fontSize: '1rem', letterSpacing: '1px', background: av.bg, color: av.color, border: `1px solid ${av.border}` }}>{initials}</div>
+        {online && <span style={{ fontSize: '0.65rem', fontWeight: 600, color: '#16a34a', letterSpacing: '0.3px', display: 'flex', alignItems: 'center', gap: '4px' }}><span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#16a34a', display: 'inline-block' }} />Online</span>}
       </div>
-
-      {/* Name + meta */}
-      <div className="font-display text-base tracking-widest uppercase mb-0.5">{profiel.naam}</div>
-      <div className="font-mono text-[10px] text-fp-muted tracking-wide mb-3">
-        {profiel.leeftijd} jr · {profiel.woonplaats} · {SITUATIE_LABELS[profiel.situatie]}
-      </div>
-
-      {/* Bio blurb */}
+      <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '1rem', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '1px', color: INK }}>{profiel.naam}</div>
+      <div style={{ fontSize: '0.68rem', color: MUTED, marginBottom: '0.85rem' }}>{profiel.leeftijd} jr · {profiel.woonplaats} · {SITUATIE_LABELS[profiel.situatie]}</div>
       {profiel.bio && (
-        <p
-          className="text-[13px] font-light text-fp-muted leading-relaxed mb-3 pl-3"
-          style={{ borderLeft: '2px solid rgba(238,240,244,0.13)' }}
-        >
-          {profiel.bio.length > 90 ? profiel.bio.slice(0, 90) + '…' : profiel.bio}
+        <p style={{ fontSize: '0.8rem', fontWeight: 300, color: MUTED, borderLeft: `2.5px solid #E8E0D8`, paddingLeft: '0.7rem', marginBottom: '0.9rem', lineHeight: 1.6, margin: '0 0 0.9rem' }}>
+          <span dangerouslySetInnerHTML={{ __html: (profiel.bio.length > 90 ? profiel.bio.slice(0, 90) + '…' : profiel.bio).replace(/\*\*(.*?)\*\*/g, `<b style="color:${INK2};font-weight:500">$1</b>`) }} />
         </p>
       )}
-
-      {/* Tags */}
-      <div className="flex flex-wrap gap-1.5">
-        {topTypes.map((type) => (
-          <span
-            key={type}
-            className="font-mono text-[10px] uppercase tracking-wide px-2 py-0.5"
-            style={{ border: '1px solid rgba(232,53,42,0.3)', color: 'rgba(232,53,42,0.8)' }}
-          >
-            {UITJE_LABELS[type] ?? type}
-          </span>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
+        {profiel.uitje_types.slice(0, 2).map(type => (
+          <span key={type} style={{ fontSize: '0.66rem', fontWeight: 500, padding: '0.2rem 0.6rem', border: '1.5px solid rgba(255,107,43,0.25)', color: AMBER, background: 'rgba(255,107,43,0.08)', borderRadius: '100px' }}>{UITJE_MAP[type] ?? type}</span>
         ))}
-        <span
-          className="font-mono text-[10px] uppercase tracking-wide px-2 py-0.5"
-          style={{ border: '1px solid rgba(238,240,244,0.13)', color: '#6B7590' }}
-        >
-          {SITUATIE_LABELS[profiel.situatie]}
-        </span>
+        <span style={{ fontSize: '0.66rem', fontWeight: 500, padding: '0.2rem 0.6rem', border: `1.5px solid ${B1}`, color: MUTED, borderRadius: '100px' }}>{SITUATIE_LABELS[profiel.situatie]}</span>
       </div>
     </div>
   )
@@ -205,36 +133,50 @@ export function ProfielCard({ profiel, online }: ProfielCardProps) {
 // ── HoeHetWerkt ──────────────────────────────────────────────
 const STAPPEN = [
   { n: '01', title: 'Maak een profiel', body: 'Gratis en anoniem. Vertel wat je leuk vindt en wat voor maatje je zoekt.' },
-  { n: '02', title: 'Blader & filter', body: 'Zoek op type uitje, stad of leeftijd. Vind iemand op dezelfde golflengte.' },
+  { n: '02', title: 'Blader & filter',  body: 'Zoek op type uitje, stad of leeftijd. Vind iemand op dezelfde golflengte.' },
   { n: '03', title: 'Stuur een berichtje', body: 'Neem contact op en bespreek waar jullie naartoe gaan. Direct en zonder gedoe.' },
   { n: '04', title: 'Ga samen!', body: 'Geen labels, geen verplichtingen. Gewoon lekker genieten van een avond uit.' },
 ]
 
 export function HoeHetWerkt() {
   return (
-    <section
-      id="hoe-het-werkt"
-      className="px-8 py-10 max-w-5xl mx-auto border-t"
-      style={{ borderColor: 'rgba(238,240,244,0.07)' }}
-    >
-      <h2 className="font-display text-xl tracking-widest uppercase mb-6">Zo werkt het</h2>
-      <div
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border"
-        style={{ borderColor: 'rgba(238,240,244,0.07)' }}
-      >
-        {STAPPEN.map((s, i) => (
-          <div
-            key={s.n}
-            className="p-6 border-r last:border-r-0"
-            style={{ background: '#151C27', borderColor: 'rgba(238,240,244,0.07)' }}
-          >
-            <div className="font-display text-5xl leading-none mb-3" style={{ color: '#232E42' }}>
-              {s.n}
+    <section id="hoe-het-werkt" style={{ padding: '2rem 2rem 3rem', maxWidth: '980px', margin: '0 auto', borderTop: `1.5px solid ${B1}` }}>
+      <h2 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '1.3rem', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '1.5rem', color: INK }}>Zo werkt het</h2>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
+        {STAPPEN.map(s => (
+          <div key={s.n} style={{ background: S1, padding: '1.5rem', borderRadius: '12px', border: `1.5px solid ${B1}` }}>
+            <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '2.8rem', letterSpacing: '2px', color: '#E8E0D8', lineHeight: 1, marginBottom: '0.7rem' }}>{s.n}</div>
+            <h3 style={{ fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.35rem', color: INK }}>{s.title}</h3>
+            <p style={{ fontSize: '0.78rem', fontWeight: 300, color: MUTED, lineHeight: 1.65, margin: 0 }}>{s.body}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+// ── Quotes ───────────────────────────────────────────────────
+const QUOTES = [
+  { text: '"Via feestjepakken iemand gevonden voor Awakenings. Zelfde muziekssmaak, top avond. Mijn vrienden snappen dat gewoon niet."', name: 'Sara, 28', detail: 'Amsterdam · Techno', av: AV[0], initials: 'SV' },
+  { text: '"Mijn vrouw houdt niet van theater. Nu ga ik gewoon met iemand die er ook van geniet. Zo simpel is het eigenlijk."', name: 'Max, 34', detail: 'Utrecht · Theater & Film', av: AV[1], initials: 'MH' },
+  { text: '"Eindelijk iemand gevonden voor Lowlands! Had al bijna mijn kaartje verkocht. Zo blij dat ik dit platform heb gevonden."', name: 'Lena, 26', detail: 'Rotterdam · Festival', av: AV[2], initials: 'LR' },
+]
+
+export function Quotes() {
+  return (
+    <section style={{ padding: '0 2rem 3rem', maxWidth: '980px', margin: '0 auto', borderTop: `1.5px solid ${B1}`, paddingTop: '2rem' }}>
+      <h2 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '1.3rem', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '1.5rem', color: INK }}>Wat anderen zeggen</h2>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
+        {QUOTES.map((q, i) => (
+          <div key={i} style={{ background: S1, border: `1.5px solid ${B1}`, borderRadius: '12px', padding: '1.4rem' }}>
+            <p style={{ fontSize: '0.88rem', fontWeight: 300, color: INK2, lineHeight: 1.7, marginBottom: '1rem', fontStyle: 'italic' }}>{q.text}</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Bebas Neue', sans-serif", fontSize: '0.75rem', background: q.av.bg, color: q.av.color, flexShrink: 0 }}>{q.initials}</div>
+              <div>
+                <div style={{ fontSize: '0.78rem', fontWeight: 600, color: INK }}>{q.name}</div>
+                <div style={{ fontSize: '0.68rem', color: MUTED }}>{q.detail}</div>
+              </div>
             </div>
-            <h3 className="font-mono text-[11px] tracking-widest uppercase text-fp-offwhite mb-2">
-              {s.title}
-            </h3>
-            <p className="text-[13px] font-light text-fp-muted leading-relaxed">{s.body}</p>
           </div>
         ))}
       </div>
@@ -243,7 +185,7 @@ export function HoeHetWerkt() {
 }
 
 // ── FotoCarousel ─────────────────────────────────────────────
-const CAROUSEL_PHOTOS = [
+const PHOTOS = [
   { id: '1540575467369-52fbc0f9ea4e', alt: 'Concert' },
   { id: '1501281668745-f7f57925c2ac', alt: 'Festival' },
   { id: '1493676304819-0d840a92a260', alt: 'Club' },
@@ -255,32 +197,23 @@ const CAROUSEL_PHOTOS = [
 ]
 
 export function FotoCarousel() {
-  const photos = [...CAROUSEL_PHOTOS, ...CAROUSEL_PHOTOS]
-
+  const photos = [...PHOTOS, ...PHOTOS]
   return (
-    <section
-      className="border-t pt-8 pb-12"
-      style={{ borderColor: 'rgba(238,240,244,0.07)' }}
-    >
-      <div className="px-8 max-w-5xl mx-auto mb-6">
-        <h2 className="font-display text-xl tracking-widest uppercase">Zo ziet een goed avondje eruit</h2>
+    <section style={{ borderTop: `1.5px solid ${B1}`, paddingTop: '2rem', paddingBottom: '3rem', background: S2 }}>
+      <div style={{ padding: '0 2rem 1.5rem', maxWidth: '980px', margin: '0 auto' }}>
+        <h2 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '1.3rem', letterSpacing: '2px', textTransform: 'uppercase', color: INK }}>Zo ziet een goed avondje eruit</h2>
       </div>
-      <div className="overflow-hidden w-full">
-        <div className="flex gap-3 animate-carousel" style={{ width: 'max-content' }}>
+      <div style={{ overflow: 'hidden' }}>
+        <div className="animate-carousel" style={{ display: 'flex', gap: '10px', width: 'max-content' }}>
           {photos.map((p, i) => (
-            <div
-              key={i}
-              className="flex-shrink-0 w-64 h-48 overflow-hidden"
-            >
+            <div key={i} style={{ flexShrink: 0, width: '240px', height: '180px', overflow: 'hidden', borderRadius: '10px' }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={`https://images.unsplash.com/photo-${p.id}?w=520&h=400&fit=crop&auto=format&q=60`}
-                alt={p.alt}
-                className="w-full h-full object-cover transition-all duration-300"
-                style={{ filter: 'saturate(0.7) brightness(0.85)' }}
-                onMouseEnter={(e) => (e.currentTarget.style.filter = 'saturate(1) brightness(1)')}
-                onMouseLeave={(e) => (e.currentTarget.style.filter = 'saturate(0.7) brightness(0.85)')}
-                loading="lazy"
+                src={`https://images.unsplash.com/photo-${p.id}?w=480&h=360&fit=crop&auto=format&q=60`}
+                alt={p.alt} loading="lazy"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'saturate(0.85) brightness(0.92)', transition: 'filter 0.4s' }}
+                onMouseEnter={e => (e.currentTarget.style.filter = 'saturate(1) brightness(1)')}
+                onMouseLeave={e => (e.currentTarget.style.filter = 'saturate(0.85) brightness(0.92)')}
               />
             </div>
           ))}
@@ -290,17 +223,33 @@ export function FotoCarousel() {
   )
 }
 
+// ── CtaBanner ────────────────────────────────────────────────
+export function CtaBanner() {
+  return (
+    <div style={{ padding: '3rem 2rem', maxWidth: '980px', margin: '0 auto' }}>
+      <div style={{ background: INK, borderRadius: '16px', padding: '2.5rem 2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '2rem', flexWrap: 'wrap' }}>
+        <div>
+          <h2 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '2rem', letterSpacing: '2px', textTransform: 'uppercase', lineHeight: 1.05, color: '#FAF7F4', margin: 0 }}>
+            Klaar om <span style={{ color: AMBER }}>samen uit</span> te gaan?
+          </h2>
+          <p style={{ color: 'rgba(250,247,244,0.55)', fontSize: '0.85rem', fontWeight: 300, marginTop: '0.4rem', margin: '0.4rem 0 0' }}>Gratis aanmelden, eerste reactie is op ons. Geen verplichtingen.</p>
+        </div>
+        <a href="/aanmelden" style={{ display: 'inline-flex', alignItems: 'center', padding: '0.85rem 2rem', fontFamily: "'DM Sans', sans-serif", fontSize: '0.82rem', fontWeight: 500, color: '#fff', background: AMBER, borderRadius: '6px', textDecoration: 'none', border: 'none', whiteSpace: 'nowrap' }}>
+          Maak gratis profiel aan →
+        </a>
+      </div>
+    </div>
+  )
+}
+
 // ── Footer ───────────────────────────────────────────────────
 export function Footer() {
   return (
-    <footer
-      className="border-t py-8 text-center"
-      style={{ borderColor: 'rgba(238,240,244,0.07)' }}
-    >
-      <div className="font-display text-xl tracking-widest mb-1">
-        FEESTJE<span className="text-fp-red">PAKKEN</span>
+    <footer style={{ borderTop: `1.5px solid ${B1}`, padding: '2rem', textAlign: 'center', background: S1 }}>
+      <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '1.4rem', letterSpacing: '3px', marginBottom: '0.35rem', color: INK }}>
+        FEESTJE<span style={{ color: AMBER }}>PAKKEN</span>
       </div>
-      <p className="font-mono text-[10px] tracking-widest uppercase text-fp-muted">
+      <p style={{ fontSize: '0.7rem', fontWeight: 400, color: MUTED, letterSpacing: '0.5px', textTransform: 'uppercase', margin: 0 }}>
         Uitjesmaatjes vinden in heel Nederland · Gratis · Geen datingsite
       </p>
     </footer>

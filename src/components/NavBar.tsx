@@ -1,138 +1,51 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import type { User } from '@supabase/supabase-js'
+import { useState } from 'react'
 
 export default function NavBar() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [user, setUser] = useState<User | null>(null)
-  const router = useRouter()
-
-  useEffect(() => {
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data }) => setUser(data.user))
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
-      setUser(session?.user ?? null)
-    })
-
-    return () => subscription.unsubscribe()
-  }, [])
-
-  async function handleSignOut() {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    setMenuOpen(false)
-    router.push('/')
-    router.refresh()
-  }
 
   return (
-    <nav
-      className="sticky top-0 z-50 flex items-center justify-between px-8 py-4 border-b"
-      style={{
-        background: 'rgba(14,18,26,0.96)',
-        backdropFilter: 'blur(10px)',
-        borderColor: 'rgba(238,240,244,0.07)',
-      }}
-    >
-      {/* Logo */}
-      <Link href="/" className="font-display text-2xl tracking-widest text-fp-white">
-        FEESTJE<span className="text-fp-red">PAKKEN</span>
+    <nav style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: '1rem 2rem',
+      borderBottom: '1.5px solid rgba(28,21,16,0.08)',
+      position: 'sticky', top: 0, zIndex: 100,
+      background: 'rgba(250,247,244,0.96)',
+      backdropFilter: 'blur(12px)',
+    }}>
+      <Link href="/" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '1.55rem', letterSpacing: '2px', color: '#1C1510', textDecoration: 'none' }}>
+        FEESTJE<span style={{ color: '#FF6B2B' }}>PAKKEN</span>
       </Link>
 
-      {/* Desktop nav */}
-      <ul className="hidden md:flex gap-8 list-none">
-        {[
-          { label: 'Profielen', href: '/uitjes' },
-          { label: 'Hoe het werkt', href: '/#hoe-het-werkt' },
-        ].map((item) => (
+      <ul style={{ display: 'flex', gap: '2rem', listStyle: 'none', margin: 0, padding: 0 }} className="hidden md:flex">
+        {[{ label: 'Profielen', href: '/#profielen' }, { label: 'Hoe het werkt', href: '/#hoe-het-werkt' }].map(item => (
           <li key={item.href}>
-            <Link
-              href={item.href}
-              className="font-mono text-xs tracking-widest uppercase text-fp-muted hover:text-fp-white transition-colors"
-            >
-              {item.label}
-            </Link>
+            <Link href={item.href} style={{ fontSize: '0.82rem', fontWeight: 500, color: '#8A7D72', textDecoration: 'none', letterSpacing: '0.3px', transition: 'color 0.2s' }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#1C1510')}
+              onMouseLeave={e => (e.currentTarget.style.color = '#8A7D72')}
+            >{item.label}</Link>
           </li>
         ))}
       </ul>
 
-      {/* Desktop CTA */}
-      <div className="hidden md:flex gap-2">
-        {user ? (
-          <>
-            <Link
-              href="/profiel"
-              className="font-mono text-xs tracking-widest uppercase px-4 py-2 text-fp-muted border transition-colors hover:text-fp-white hover:border-fp-offwhite/30"
-              style={{ borderColor: 'rgba(238,240,244,0.13)', background: 'transparent' }}
-            >
-              Mijn profiel
-            </Link>
-            <button
-              onClick={handleSignOut}
-              className="font-mono text-xs tracking-widest uppercase px-4 py-2 text-white bg-fp-red hover:bg-red-500 transition-colors"
-            >
-              Uitloggen
-            </button>
-          </>
-        ) : (
-          <>
-            <Link
-              href="/inloggen"
-              className="font-mono text-xs tracking-widest uppercase px-4 py-2 text-fp-muted border transition-colors hover:text-fp-white hover:border-fp-offwhite/30"
-              style={{ borderColor: 'rgba(238,240,244,0.13)', background: 'transparent' }}
-            >
-              Inloggen
-            </Link>
-            <Link
-              href="/aanmelden"
-              className="font-mono text-xs tracking-widest uppercase px-4 py-2 text-white bg-fp-red hover:bg-red-500 transition-colors"
-            >
-              Aanmelden
-            </Link>
-          </>
-        )}
+      <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <Link href="/inloggen" style={{
+          display: 'inline-flex', alignItems: 'center', padding: '0.5rem 1.2rem',
+          fontFamily: "'DM Sans', sans-serif", fontSize: '0.8rem', fontWeight: 500,
+          color: '#3A2E26', background: 'transparent',
+          border: '1.5px solid rgba(28,21,16,0.14)', borderRadius: '6px',
+          textDecoration: 'none', transition: 'all 0.2s',
+        }}>Inloggen</Link>
+        <Link href="/aanmelden" style={{
+          display: 'inline-flex', alignItems: 'center', padding: '0.5rem 1.2rem',
+          fontFamily: "'DM Sans', sans-serif", fontSize: '0.8rem', fontWeight: 500,
+          color: '#fff', background: '#FF6B2B',
+          border: 'none', borderRadius: '6px',
+          textDecoration: 'none', transition: 'all 0.2s',
+        }}>Aanmelden</Link>
       </div>
-
-      {/* Mobile hamburger */}
-      <button
-        className="md:hidden text-fp-muted hover:text-fp-white"
-        onClick={() => setMenuOpen(!menuOpen)}
-        aria-label="Menu openen"
-      >
-        <div className="w-5 h-0.5 bg-current mb-1" />
-        <div className="w-5 h-0.5 bg-current mb-1" />
-        <div className="w-5 h-0.5 bg-current" />
-      </button>
-
-      {/* Mobile menu */}
-      {menuOpen && (
-        <div
-          className="absolute top-full left-0 right-0 p-6 flex flex-col gap-4 border-b"
-          style={{
-            background: 'rgba(14,18,26,0.98)',
-            borderColor: 'rgba(238,240,244,0.07)',
-          }}
-        >
-          <Link href="/uitjes" onClick={() => setMenuOpen(false)} className="font-mono text-xs tracking-widest uppercase text-fp-muted">Profielen</Link>
-          <Link href="/#hoe-het-werkt" onClick={() => setMenuOpen(false)} className="font-mono text-xs tracking-widest uppercase text-fp-muted">Hoe het werkt</Link>
-          {user ? (
-            <>
-              <Link href="/profiel" onClick={() => setMenuOpen(false)} className="font-mono text-xs tracking-widest uppercase text-fp-muted">Mijn profiel</Link>
-              <button onClick={handleSignOut} className="text-left font-mono text-xs tracking-widest uppercase text-fp-red">Uitloggen →</button>
-            </>
-          ) : (
-            <>
-              <Link href="/inloggen" onClick={() => setMenuOpen(false)} className="font-mono text-xs tracking-widest uppercase text-fp-muted">Inloggen</Link>
-              <Link href="/aanmelden" onClick={() => setMenuOpen(false)} className="font-mono text-xs tracking-widest uppercase text-fp-red">Aanmelden →</Link>
-            </>
-          )}
-        </div>
-      )}
     </nav>
   )
 }

@@ -1,29 +1,11 @@
 @import "tailwindcss";
 
-@theme {
-  --color-fp-bg:       #0E121A;
-  --color-fp-surface:  #151C27;
-  --color-fp-surface2: #1C2535;
-  --color-fp-surface3: #232E42;
-  --color-fp-white:    #EEF0F4;
-  --color-fp-offwhite: #C4CAD6;
-  --color-fp-muted:    #6B7590;
-  --color-fp-muted2:   #3E4A60;
-  --color-fp-red:      #E8352A;
-  --color-fp-border:   rgba(238,240,244,0.07);
-  --color-fp-border2:  rgba(238,240,244,0.13);
-
-  --font-display: 'Bebas Neue', sans-serif;
-  --font-mono:    'IBM Plex Mono', monospace;
-  --font-body:    'IBM Plex Sans', sans-serif;
-}
-
 @layer base {
   html { scroll-behavior: smooth; }
   body {
-    background-color: #0E121A;
-    color: #EEF0F4;
-    font-family: 'IBM Plex Sans', sans-serif;
+    background-color: #FAF7F4;
+    color: #1C1510;
+    font-family: 'DM Sans', sans-serif;
     -webkit-font-smoothing: antialiased;
   }
   * { box-sizing: border-box; }
@@ -34,7 +16,7 @@
   to   { transform: translateX(-50%); }
 }
 .animate-ticker {
-  animation: ticker 24s linear infinite;
+  animation: ticker 26s linear infinite;
 }
 .animate-ticker:hover { animation-play-state: paused; }
 
@@ -43,6 +25,6 @@
   to   { transform: translateX(-50%); }
 }
 .animate-carousel {
-  animation: carousel 32s linear infinite;
+  animation: carousel 34s linear infinite;
 }
 .animate-carousel:hover { animation-play-state: paused; }
