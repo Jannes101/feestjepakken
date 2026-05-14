@@ -77,7 +77,13 @@ export default function NieuwUitjeFormulier({ userId, leeftijdCategorie, geslach
       .single()
 
     if (error) {
-      setFout('Er is iets misgegaan. Probeer het opnieuw.')
+      console.error('[uitje insert] Supabase error:', {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+      })
+      setFout(`Fout (${error.code}): ${error.message}`)
       setLoading(false)
       return
     }
