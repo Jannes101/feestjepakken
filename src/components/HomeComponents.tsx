@@ -92,11 +92,12 @@ const AV = [
 type CardProfile = Pick<UserProfile, 'id' | 'naam' | 'leeftijd' | 'woonplaats' | 'bio' | 'situatie' | 'uitje_types'> & {
   social_score?: number | null
   aantal_beoordelingen?: number
+  foto_url?: string | null
 }
 const SITUATIE_LABELS: Record<string, string> = { single: 'Single', relatie: 'In relatie', getrouwd: 'Getrouwd', liever_niet_zeggen: '—' }
 const UITJE_MAP = Object.fromEntries(UITJE_TYPES.map(t => [t.value, t.label]))
 
-export function ProfielCard({ profiel, online }: { profiel: CardProfile; online?: boolean }) {
+export function ProfielCard({ profiel, online, viewerHeeftCredits }: { profiel: CardProfile; online?: boolean; viewerHeeftCredits?: boolean }) {
   const initials = profiel.naam.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
   const av = AV[profiel.naam.charCodeAt(0) % AV.length]
   const [hovered, setHovered] = useState(false)
@@ -114,7 +115,12 @@ export function ProfielCard({ profiel, online }: { profiel: CardProfile; online?
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-        <div style={{ width: '40px', height: '40px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Bebas Neue', sans-serif", fontSize: '1rem', letterSpacing: '1px', background: av.bg, color: av.color, border: `1px solid ${av.border}` }}>{initials}</div>
+        {viewerHeeftCredits && profiel.foto_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={profiel.foto_url} alt={profiel.naam} style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover' }} />
+        ) : (
+          <div style={{ width: '40px', height: '40px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Bebas Neue', sans-serif", fontSize: '1rem', letterSpacing: '1px', background: av.bg, color: av.color, border: `1px solid ${av.border}` }}>{initials}</div>
+        )}
         {online && <span style={{ fontSize: '0.65rem', fontWeight: 600, color: '#16a34a', letterSpacing: '0.3px', display: 'flex', alignItems: 'center', gap: '4px' }}><span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#16a34a', display: 'inline-block' }} />Online</span>}
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1px', flexWrap: 'wrap' }}>

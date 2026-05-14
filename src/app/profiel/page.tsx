@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import LogoutButton from '@/components/LogoutButton'
+import ProfielFotoUpload from '@/components/ProfielFotoUpload'
 
 const AMBER = '#FF6B2B'
 const INK = '#1C1510'
@@ -27,7 +28,7 @@ export default async function ProfielPage() {
 
   const { data: profile } = await supabase
     .from('users')
-    .select('credits')
+    .select('credits, foto_url')
     .eq('id', user.id)
     .single()
 
@@ -49,6 +50,13 @@ export default async function ProfielPage() {
         <p style={{ fontSize: '0.72rem', fontWeight: 500, letterSpacing: '1px', textTransform: 'uppercase', color: MUTED, marginBottom: '2rem' }}>
           {user.email}
         </p>
+
+        {/* Profielfoto */}
+        <ProfielFotoUpload
+          userId={user.id}
+          huidigeFotoPath={profile?.foto_url ?? null}
+          naam={meta.naam ?? ''}
+        />
 
         {/* Credits */}
         <div style={{ background: '#fff', border: `1.5px solid ${B2}`, borderRadius: '12px', padding: '1.25rem 1.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
