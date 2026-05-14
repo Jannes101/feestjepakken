@@ -1,10 +1,38 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+import type { User } from '@supabase/supabase-js'
+
+const BTN_BASE = {
+  display: 'inline-flex', alignItems: 'center', padding: '0.5rem 1.2rem',
+  fontFamily: "'DM Sans', sans-serif", fontSize: '0.8rem', fontWeight: 500,
+  borderRadius: '6px', textDecoration: 'none', transition: 'all 0.2s', cursor: 'pointer',
+} as const
 
 export default function NavBar() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
+  const router = useRouter()
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => setUser(data.user))
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setUser(session?.user ?? null)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
+  async function handleSignOut() {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    setMenuOpen(false)
+    router.push('/')
+    router.refresh()
+  }
 
   return (
     <nav style={{
@@ -31,20 +59,25 @@ export default function NavBar() {
       </ul>
 
       <div style={{ display: 'flex', gap: '0.5rem' }}>
-        <Link href="/inloggen" style={{
-          display: 'inline-flex', alignItems: 'center', padding: '0.5rem 1.2rem',
-          fontFamily: "'DM Sans', sans-serif", fontSize: '0.8rem', fontWeight: 500,
-          color: '#3A2E26', background: 'transparent',
-          border: '1.5px solid rgba(28,21,16,0.14)', borderRadius: '6px',
-          textDecoration: 'none', transition: 'all 0.2s',
-        }}>Inloggen</Link>
-        <Link href="/aanmelden" style={{
-          display: 'inline-flex', alignItems: 'center', padding: '0.5rem 1.2rem',
-          fontFamily: "'DM Sans', sans-serif", fontSize: '0.8rem', fontWeight: 500,
-          color: '#fff', background: '#FF6B2B',
-          border: 'none', borderRadius: '6px',
-          textDecoration: 'none', transition: 'all 0.2s',
-        }}>Aanmelden</Link>
+        {user ? (
+          <>
+            <Link href="/profiel" style={{ ...BTN_BASE, color: '#3A2E26', background: 'transparent', border: '1.5px solid rgba(28,21,16,0.14)' }}>
+              Mijn profiel
+            </Link>
+            <button onClick={handleSignOut} style={{ ...BTN_BASE, color: '#fff', background: '#FF6B2B', border: 'none' }}>
+              Uitloggen
+            </button>
+          </>
+        ) : (
+          <>
+            <Link href="/inloggen" style={{ ...BTN_BASE, color: '#3A2E26', background: 'transparent', border: '1.5px solid rgba(28,21,16,0.14)' }}>
+              Inloggen
+            </Link>
+            <Link href="/aanmelden" style={{ ...BTN_BASE, color: '#fff', background: '#FF6B2B', border: 'none' }}>
+              Aanmelden
+            </Link>
+          </>
+        )}
       </div>
     </nav>
   )

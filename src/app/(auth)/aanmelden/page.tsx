@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { UITJE_TYPES } from '@/types'
 import type { UitjeType } from '@/types'
+import { createClient } from '@/lib/supabase/client'
 
 const AMBER = '#FF6B2B'
 const INK = '#1C1510'
@@ -16,6 +17,7 @@ export default function AanmeldenPage() {
   const [selectedTypes, setSelectedTypes] = useState<UitjeType[]>([])
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
+  const [error, setError] = useState('')
 
   function toggleType(type: UitjeType) {
     setSelectedTypes(prev => prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type])
@@ -24,8 +26,37 @@ export default function AanmeldenPage() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setLoading(true)
-    // TODO FEES-8: Supabase auth signUp
-    await new Promise(r => setTimeout(r, 1000))
+    setError('')
+
+    const fd = new FormData(e.currentTarget)
+    const supabase = createClient()
+    const { error: signUpError } = await supabase.auth.signUp({
+      email: fd.get('email') as string,
+      password: fd.get('wachtwoord') as string,
+      options: {
+        data: {
+          naam: fd.get('naam') as string,
+          leeftijd: Number(fd.get('leeftijd')),
+          woonplaats: fd.get('woonplaats') as string,
+          situatie: fd.get('situatie') as string,
+          reis_afstand: fd.get('reis_afstand') as string,
+          bio: fd.get('bio') as string,
+          uitje_types: selectedTypes,
+        },
+        emailRedirectTo: `${window.location.origin}/verify`,
+      },
+    })
+
+    if (signUpError) {
+      setError(
+        signUpError.message.includes('already registered')
+          ? 'Dit e-mailadres is al in gebruik.'
+          : signUpError.message
+      )
+      setLoading(false)
+      return
+    }
+
     setDone(true)
     setLoading(false)
   }
@@ -107,6 +138,9 @@ export default function AanmeldenPage() {
             style={{ width: '100%', padding: '0.95rem', border: 'none', background: AMBER, color: '#fff', fontFamily: "'Bebas Neue', sans-serif", fontSize: '1.1rem', letterSpacing: '3px', textTransform: 'uppercase', cursor: 'pointer', borderRadius: '8px', marginTop: '1.5rem', opacity: loading ? 0.7 : 1 }}>
             {loading ? 'Even geduld…' : 'Profiel aanmaken'}
           </button>
+          {error && (
+            <p style={{ fontSize: '0.78rem', color: '#dc2626', marginTop: '1rem' }}>{error}</p>
+          )}
           <p style={{ textAlign: 'center', fontSize: '0.68rem', color: 'rgba(28,21,16,0.3)', marginTop: '0.85rem' }}>Gegevens worden nooit gedeeld · Jij bepaalt wat anderen zien</p>
         </form>
 
