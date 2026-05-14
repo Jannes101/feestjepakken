@@ -17,7 +17,7 @@ const HOOFDSTUKKEN = [
   {
     nr: '01',
     titel: 'Voor wie is feestjepakken?',
-    body: 'Feestjepakken is bedoeld voor mensen tussen 24 en 50 jaar die op zoek zijn naar een maatje om samen een uitje mee te beleven. Of je nu single bent of in een relatie — iedereen is welkom zolang je je aan de spelregels houdt.',
+    body: 'Feestjepakken is bedoeld voor mensen vanaf 21 jaar die op zoek zijn naar een maatje om samen een uitje mee te beleven. Of je nu single bent of in een relatie — iedereen is welkom zolang je je aan de spelregels houdt.',
   },
   {
     nr: '02',
