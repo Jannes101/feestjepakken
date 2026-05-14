@@ -1,10 +1,34 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import type { User } from '@supabase/supabase-js'
 
 export default function NavBar() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
+  const router = useRouter()
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => setUser(data.user))
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  async function handleSignOut() {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    setMenuOpen(false)
+    router.push('/')
+    router.refresh()
+  }
 
   return (
     <nav
@@ -37,21 +61,41 @@ export default function NavBar() {
         ))}
       </ul>
 
-      {/* CTA buttons */}
+      {/* Desktop CTA */}
       <div className="hidden md:flex gap-2">
-        <Link
-          href="/inloggen"
-          className="font-mono text-xs tracking-widest uppercase px-4 py-2 text-fp-muted border transition-colors hover:text-fp-white hover:border-fp-offwhite/30"
-          style={{ borderColor: 'rgba(238,240,244,0.13)', background: 'transparent' }}
-        >
-          Inloggen
-        </Link>
-        <Link
-          href="/aanmelden"
-          className="font-mono text-xs tracking-widest uppercase px-4 py-2 text-white bg-fp-red hover:bg-red-500 transition-colors"
-        >
-          Aanmelden
-        </Link>
+        {user ? (
+          <>
+            <Link
+              href="/profiel"
+              className="font-mono text-xs tracking-widest uppercase px-4 py-2 text-fp-muted border transition-colors hover:text-fp-white hover:border-fp-offwhite/30"
+              style={{ borderColor: 'rgba(238,240,244,0.13)', background: 'transparent' }}
+            >
+              Mijn profiel
+            </Link>
+            <button
+              onClick={handleSignOut}
+              className="font-mono text-xs tracking-widest uppercase px-4 py-2 text-white bg-fp-red hover:bg-red-500 transition-colors"
+            >
+              Uitloggen
+            </button>
+          </>
+        ) : (
+          <>
+            <Link
+              href="/inloggen"
+              className="font-mono text-xs tracking-widest uppercase px-4 py-2 text-fp-muted border transition-colors hover:text-fp-white hover:border-fp-offwhite/30"
+              style={{ borderColor: 'rgba(238,240,244,0.13)', background: 'transparent' }}
+            >
+              Inloggen
+            </Link>
+            <Link
+              href="/aanmelden"
+              className="font-mono text-xs tracking-widest uppercase px-4 py-2 text-white bg-fp-red hover:bg-red-500 transition-colors"
+            >
+              Aanmelden
+            </Link>
+          </>
+        )}
       </div>
 
       {/* Mobile hamburger */}
@@ -74,10 +118,19 @@ export default function NavBar() {
             borderColor: 'rgba(238,240,244,0.07)',
           }}
         >
-          <Link href="/uitjes" className="font-mono text-xs tracking-widest uppercase text-fp-muted">Profielen</Link>
-          <Link href="/#hoe-het-werkt" className="font-mono text-xs tracking-widest uppercase text-fp-muted">Hoe het werkt</Link>
-          <Link href="/inloggen" className="font-mono text-xs tracking-widest uppercase text-fp-muted">Inloggen</Link>
-          <Link href="/aanmelden" className="font-mono text-xs tracking-widest uppercase text-fp-red">Aanmelden →</Link>
+          <Link href="/uitjes" onClick={() => setMenuOpen(false)} className="font-mono text-xs tracking-widest uppercase text-fp-muted">Profielen</Link>
+          <Link href="/#hoe-het-werkt" onClick={() => setMenuOpen(false)} className="font-mono text-xs tracking-widest uppercase text-fp-muted">Hoe het werkt</Link>
+          {user ? (
+            <>
+              <Link href="/profiel" onClick={() => setMenuOpen(false)} className="font-mono text-xs tracking-widest uppercase text-fp-muted">Mijn profiel</Link>
+              <button onClick={handleSignOut} className="text-left font-mono text-xs tracking-widest uppercase text-fp-red">Uitloggen →</button>
+            </>
+          ) : (
+            <>
+              <Link href="/inloggen" onClick={() => setMenuOpen(false)} className="font-mono text-xs tracking-widest uppercase text-fp-muted">Inloggen</Link>
+              <Link href="/aanmelden" onClick={() => setMenuOpen(false)} className="font-mono text-xs tracking-widest uppercase text-fp-red">Aanmelden →</Link>
+            </>
+          )}
         </div>
       )}
     </nav>
