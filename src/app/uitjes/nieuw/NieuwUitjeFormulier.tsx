@@ -41,6 +41,12 @@ export default function NieuwUitjeFormulier({ userId, leeftijdCategorie, geslach
   const [selectedType, setSelectedType] = useState<UitjeType>('overig')
   const [omvang, setOmvang] = useState<Omvang>('solo')
   const [deelname, setDeelname] = useState<DeelnameVoorkeur>('iedereen')
+  const [selectedCats, setSelectedCats] = useState<LeeftijdCategorie[]>([leeftijdCategorie])
+
+  function toggleCat(cat: LeeftijdCategorie) {
+    if (cat === leeftijdCategorie) return
+    setSelectedCats(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat])
+  }
 
   const deelnameOpties = toegestaneDeelnameOpties(geslacht, gender)
 
@@ -63,7 +69,7 @@ export default function NieuwUitjeFormulier({ userId, leeftijdCategorie, geslach
         locatie: fd.get('locatie') as string,
         provincie: (fd.get('provincie') as string) || null,
         max_personen: Number(fd.get('max_personen')),
-        leeftijdscategorie: leeftijdCategorie,
+        leeftijdscategorie: selectedCats,
         omvang,
         deelname_voorkeur: deelname,
       })
@@ -143,15 +149,41 @@ export default function NieuwUitjeFormulier({ userId, leeftijdCategorie, geslach
         </div>
       </div>
 
-      {/* Leeftijdscategorie (readonly) */}
-      <div style={{ background: '#FAF7F4', borderRadius: '8px', padding: '0.75rem 1rem', marginBottom: '1.25rem', border: `1px solid ${B1}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div>
+      {/* Leeftijdscategorie multi-select */}
+      <div style={{ marginBottom: '1.25rem' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', marginBottom: '0.6rem' }}>
           <p style={{ ...labelStyle, margin: 0 }}>Leeftijdscategorie</p>
-          <p style={{ fontSize: '0.82rem', color: INK, fontWeight: 500, margin: '2px 0 0', fontFamily: "'DM Sans', sans-serif" }}>
-            {LABEL_MAP[leeftijdCategorie]}
-          </p>
+          <span style={{ fontSize: '0.65rem', color: MUTED, fontFamily: "'DM Sans', sans-serif" }}>Meerdere mogelijk</span>
         </div>
-        <span style={{ fontSize: '0.68rem', color: MUTED, fontFamily: "'DM Sans', sans-serif" }}>Bepaald door jouw leeftijd</span>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+          {LEEFTIJD_CATEGORIEEN.map(c => {
+            const isOwn = c.value === leeftijdCategorie
+            const isSelected = selectedCats.includes(c.value)
+            return (
+              <button
+                key={c.value}
+                type="button"
+                disabled={isOwn}
+                onClick={() => toggleCat(c.value)}
+                style={{
+                  fontSize: '0.73rem', fontWeight: isOwn ? 600 : 500, padding: '0.4rem 1rem',
+                  borderRadius: '100px',
+                  border: `1.5px solid ${isSelected ? 'rgba(255,107,43,0.4)' : B1}`,
+                  background: isSelected ? 'rgba(255,107,43,0.08)' : '#FAF7F4',
+                  color: isSelected ? AMBER : MUTED,
+                  cursor: isOwn ? 'default' : 'pointer',
+                  transition: 'all 0.15s',
+                  display: 'flex', alignItems: 'center', gap: '4px',
+                }}>
+                {c.label}
+                {isOwn && <span style={{ fontSize: '0.55rem', opacity: 0.6 }}>●</span>}
+              </button>
+            )
+          })}
+        </div>
+        <p style={{ fontSize: '0.65rem', color: MUTED, marginTop: '0.45rem', fontFamily: "'DM Sans', sans-serif" }}>
+          Jouw categorie ({LABEL_MAP[leeftijdCategorie]}) is altijd inbegrepen en kan niet worden uitgevinkt.
+        </p>
       </div>
 
       {/* Deelname voorkeur */}
