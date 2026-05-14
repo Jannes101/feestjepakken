@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { UITJE_TYPES, type UitjeType, type UserProfile } from '@/types'
+import SocialScoreBadge from '@/components/SocialScoreBadge'
 
 const B1 = 'rgba(28,21,16,0.08)'
 const B2 = 'rgba(28,21,16,0.14)'
@@ -88,7 +89,10 @@ const AV = [
 ]
 
 // ── ProfielCard ──────────────────────────────────────────────
-type CardProfile = Pick<UserProfile, 'id' | 'naam' | 'leeftijd' | 'woonplaats' | 'bio' | 'situatie' | 'uitje_types'>
+type CardProfile = Pick<UserProfile, 'id' | 'naam' | 'leeftijd' | 'woonplaats' | 'bio' | 'situatie' | 'uitje_types'> & {
+  social_score?: number | null
+  aantal_beoordelingen?: number
+}
 const SITUATIE_LABELS: Record<string, string> = { single: 'Single', relatie: 'In relatie', getrouwd: 'Getrouwd', liever_niet_zeggen: '—' }
 const UITJE_MAP = Object.fromEntries(UITJE_TYPES.map(t => [t.value, t.label]))
 
@@ -113,7 +117,10 @@ export function ProfielCard({ profiel, online }: { profiel: CardProfile; online?
         <div style={{ width: '40px', height: '40px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Bebas Neue', sans-serif", fontSize: '1rem', letterSpacing: '1px', background: av.bg, color: av.color, border: `1px solid ${av.border}` }}>{initials}</div>
         {online && <span style={{ fontSize: '0.65rem', fontWeight: 600, color: '#16a34a', letterSpacing: '0.3px', display: 'flex', alignItems: 'center', gap: '4px' }}><span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#16a34a', display: 'inline-block' }} />Online</span>}
       </div>
-      <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '1rem', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '1px', color: INK }}>{profiel.naam}</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1px', flexWrap: 'wrap' }}>
+        <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '1rem', letterSpacing: '1.5px', textTransform: 'uppercase', color: INK }}>{profiel.naam}</div>
+        <SocialScoreBadge score={profiel.social_score ?? null} aantalBeoordelingen={profiel.aantal_beoordelingen ?? 0} size="sm" />
+      </div>
       <div style={{ fontSize: '0.68rem', color: MUTED, marginBottom: '0.85rem' }}>{profiel.leeftijd} jr · {profiel.woonplaats} · {SITUATIE_LABELS[profiel.situatie]}</div>
       {profiel.bio && (
         <p style={{ fontSize: '0.8rem', fontWeight: 300, color: MUTED, borderLeft: `2.5px solid #E8E0D8`, paddingLeft: '0.7rem', marginBottom: '0.9rem', lineHeight: 1.6, margin: '0 0 0.9rem' }}>
