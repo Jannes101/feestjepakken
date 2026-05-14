@@ -249,9 +249,12 @@ export function Footer() {
       <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '1.4rem', letterSpacing: '3px', marginBottom: '0.35rem', color: INK }}>
         FEESTJE<span style={{ color: AMBER }}>PAKKEN</span>
       </div>
-      <p style={{ fontSize: '0.7rem', fontWeight: 400, color: MUTED, letterSpacing: '0.5px', textTransform: 'uppercase', margin: 0 }}>
+      <p style={{ fontSize: '0.7rem', fontWeight: 400, color: MUTED, letterSpacing: '0.5px', textTransform: 'uppercase', margin: '0 0 0.6rem' }}>
         Uitjesmaatjes vinden in heel Nederland · Gratis · Geen datingsite
       </p>
+      <a href="/spelregels" style={{ fontSize: '0.68rem', fontWeight: 500, color: MUTED, textDecoration: 'none', letterSpacing: '0.5px', textTransform: 'uppercase', borderBottom: `1px solid ${B2}`, paddingBottom: '1px' }}>
+        Spelregels
+      </a>
     </footer>
   )
 }
