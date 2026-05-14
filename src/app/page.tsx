@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import NavBar from '@/components/NavBar'
 import HeroSection from '@/components/HeroSection'
 import { StatsRow, TickerBanner, FilterBar, ProfielCard, HoeHetWerkt, Quotes, FotoCarousel, CtaBanner, Footer } from '@/components/HomeComponents'
 import type { UitjeType, UserProfile } from '@/types'
@@ -24,7 +23,6 @@ export default function HomePage() {
 
   return (
     <main>
-      <NavBar />
       <HeroSection />
       <StatsRow />
       <TickerBanner />

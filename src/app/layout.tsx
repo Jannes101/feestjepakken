@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import NavBar from '@/components/NavBar'
+import SchorsingsBanner from '@/components/SchorsingsBanner'
 
 export const metadata: Metadata = {
   title: 'Feestjepakken — Vind je uitjesmaatje',
@@ -25,7 +27,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <NavBar />
+        <SchorsingsBanner />
+        {children}
+      </body>
     </html>
   )
 }
