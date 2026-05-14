@@ -43,6 +43,8 @@ export interface UserProfile {
   credits: number
   gratis_reactie_gebruikt: boolean
   avatar_url: string | null
+  social_score: number | null
+  aantal_beoordelingen: number
   created_at: string
   updated_at: string
 }
@@ -83,6 +85,19 @@ export interface Rating {
   opmerking: string | null
   created_at: string
 }
+
+export interface Beoordeling {
+  id: string
+  beoordelaar_id: string
+  beoordeelde_id: string
+  uitje_id: string
+  aanbevolen: boolean
+  reden: string | null
+  created_at: string
+}
+
+/** null = nog geen beoordelingen ontvangen; number = 5.0–10.0 */
+export type SocialScore = number | null
 
 export interface Transactie {
   id: string
