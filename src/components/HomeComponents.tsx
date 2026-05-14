@@ -18,7 +18,7 @@ const S2 = '#F2EDE8'
 export function StatsRow() {
   const stats = [
     { n: '847', suffix: '+', label: 'Actieve leden' },
-    { n: '24–50', suffix: '', label: 'Leeftijdscategorie' },
+    { n: '21', suffix: '+', label: 'Leeftijd' },
     { n: 'NL', suffix: '', label: 'Heel Nederland' },
     { n: '12', suffix: '+', label: 'Type uitjes' },
   ]

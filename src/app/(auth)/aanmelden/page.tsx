@@ -42,6 +42,8 @@ export default function AanmeldenPage() {
           reis_afstand: fd.get('reis_afstand') as string,
           bio: fd.get('bio') as string,
           uitje_types: selectedTypes,
+          geslacht: fd.get('geslacht') as string,
+          gender: fd.get('gender') as string,
         },
         emailRedirectTo: `${window.location.origin}/verify`,
       },
@@ -81,12 +83,12 @@ export default function AanmeldenPage() {
           FEESTJE<span style={{ color: AMBER }}>PAKKEN</span>
         </Link>
         <h1 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '2.2rem', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '0.2rem', color: INK }}>Aanmelden</h1>
-        <p style={{ fontSize: '0.72rem', fontWeight: 500, letterSpacing: '1px', textTransform: 'uppercase', color: MUTED, marginBottom: '2rem' }}>Gratis · Anoniem · 24 t/m 50 jaar</p>
+        <p style={{ fontSize: '0.72rem', fontWeight: 500, letterSpacing: '1px', textTransform: 'uppercase', color: MUTED, marginBottom: '2rem' }}>Gratis · Anoniem · Vanaf 21 jaar</p>
 
         <form onSubmit={handleSubmit} style={{ background: '#fff', border: `1.5px solid ${B2}`, borderRadius: '14px', padding: '1.75rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
             <Field label="Voornaam"><input type="text" name="naam" required placeholder="Jouw naam" /></Field>
-            <Field label="Leeftijd"><input type="number" name="leeftijd" required placeholder="28" min={24} max={50} /></Field>
+            <Field label="Leeftijd"><input type="number" name="leeftijd" required placeholder="28" min={21} max={99} /></Field>
           </div>
           <div style={{ marginBottom: '1rem' }}><Field label="E-mailadres"><input type="email" name="email" required placeholder="naam@email.nl" /></Field></div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
@@ -110,6 +112,37 @@ export default function AanmeldenPage() {
                 <option value="heel_nl">Heel Nederland</option>
               </select>
             </Field>
+          </div>
+
+          <div style={{ height: '1px', background: B1, margin: '1.25rem 0' }} />
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+            <Field label="Geslacht" required>
+              <select name="geslacht" required>
+                <option value="">Kies...</option>
+                <option value="man">Man</option>
+                <option value="vrouw">Vrouw</option>
+                <option value="anders">Anders</option>
+              </select>
+            </Field>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: 600, color: '#8A7D72', marginBottom: '0.4rem', letterSpacing: '1px', textTransform: 'uppercase' }}>
+                Gender <span style={{ color: '#FF6B2B' }}>*</span>
+              </label>
+              <p style={{ fontSize: '0.68rem', color: '#8A7D72', lineHeight: 1.5, marginBottom: '0.5rem', fontWeight: 300 }}>
+                Geslacht gaat over je biologische kenmerken. Gender gaat over hoe jij jezelf ervaart en presenteert — dat kan overeenkomen met je geslacht, maar hoeft niet.
+              </p>
+              <div className={`[&_select]:w-full [&_select]:bg-[#FAF7F4] [&_select]:border [&_select]:border-[rgba(28,21,16,0.1)] [&_select]:rounded-lg [&_select]:px-3 [&_select]:py-2.5 [&_select]:text-[#1C1510] [&_select]:text-sm [&_select]:outline-none`}>
+                <select name="gender" required>
+                  <option value="">Kies...</option>
+                  <option value="man">Man</option>
+                  <option value="vrouw">Vrouw</option>
+                  <option value="non_binair">Non-binair</option>
+                  <option value="anders">Anders</option>
+                  <option value="zeg_liever_niet">Zeg ik liever niet</option>
+                </select>
+              </div>
+            </div>
           </div>
 
           <div style={{ height: '1px', background: B1, margin: '1.25rem 0' }} />
@@ -153,7 +186,7 @@ export default function AanmeldenPage() {
   )
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, children, required }: { label: string; children: React.ReactNode; required?: boolean }) {
   const inputStyles = `
     [&_input]:w-full [&_input]:bg-[#FAF7F4] [&_input]:border [&_input]:border-[rgba(28,21,16,0.1)]
     [&_input]:rounded-lg [&_input]:px-3 [&_input]:py-2.5 [&_input]:text-[#1C1510] [&_input]:text-sm [&_input]:outline-none
@@ -167,7 +200,9 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   `
   return (
     <div>
-      <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: 600, color: '#8A7D72', marginBottom: '0.4rem', letterSpacing: '1px', textTransform: 'uppercase' }}>{label}</label>
+      <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: 600, color: '#8A7D72', marginBottom: '0.4rem', letterSpacing: '1px', textTransform: 'uppercase' }}>
+        {label}{required && <span style={{ color: '#FF6B2B' }}> *</span>}
+      </label>
       <div className={inputStyles}>{children}</div>
     </div>
   )
