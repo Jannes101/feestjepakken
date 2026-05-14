@@ -16,8 +16,13 @@ export default function LogoutButton() {
   return (
     <button
       onClick={handleSignOut}
-      className="font-mono text-[11px] tracking-widest uppercase px-6 py-2.5 border transition-colors hover:border-fp-red hover:text-fp-red"
-      style={{ borderColor: 'rgba(238,240,244,0.13)', color: '#6B7590' }}
+      style={{
+        padding: '0.45rem 1rem',
+        fontFamily: "'DM Sans', sans-serif", fontSize: '0.8rem', fontWeight: 500,
+        color: '#8A7D72', background: 'transparent',
+        border: '1.5px solid rgba(28,21,16,0.14)', borderRadius: '6px',
+        cursor: 'pointer', transition: 'all 0.2s',
+      }}
     >
       Uitloggen
     </button>
