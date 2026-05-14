@@ -2,19 +2,34 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 
 export default function InloggenPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const router = useRouter()
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setLoading(true)
     setError('')
-    // TODO FEES-8: Supabase auth signInWithPassword
-    await new Promise((r) => setTimeout(r, 800))
-    setError('Supabase auth nog niet gekoppeld — zie FEES-8')
-    setLoading(false)
+
+    const fd = new FormData(e.currentTarget)
+    const supabase = createClient()
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: fd.get('email') as string,
+      password: fd.get('wachtwoord') as string,
+    })
+
+    if (signInError) {
+      setError('Onjuist e-mailadres of wachtwoord.')
+      setLoading(false)
+      return
+    }
+
+    router.push('/profiel')
+    router.refresh()
   }
 
   return (
