@@ -4,11 +4,13 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { UITJE_TYPES } from '@/types'
 import type { UitjeType } from '@/types'
+import { createClient } from '@/lib/supabase/client'
 
 export default function AanmeldenPage() {
   const [selectedTypes, setSelectedTypes] = useState<UitjeType[]>([])
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
+  const [error, setError] = useState('')
 
   function toggleType(type: UitjeType) {
     setSelectedTypes((prev) =>
@@ -19,8 +21,38 @@ export default function AanmeldenPage() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setLoading(true)
-    // TODO FEES-8: Supabase auth signUp + profiel aanmaken
-    await new Promise((r) => setTimeout(r, 1000))
+    setError('')
+
+    const fd = new FormData(e.currentTarget)
+    const email = fd.get('email') as string
+    const wachtwoord = fd.get('wachtwoord') as string
+    const naam = fd.get('naam') as string
+    const leeftijd = Number(fd.get('leeftijd'))
+    const woonplaats = fd.get('woonplaats') as string
+    const situatie = fd.get('situatie') as string
+    const reis_afstand = fd.get('reis_afstand') as string
+    const bio = fd.get('bio') as string
+
+    const supabase = createClient()
+    const { error: signUpError } = await supabase.auth.signUp({
+      email,
+      password: wachtwoord,
+      options: {
+        data: { naam, leeftijd, woonplaats, situatie, reis_afstand, bio, uitje_types: selectedTypes },
+        emailRedirectTo: `${window.location.origin}/verify`,
+      },
+    })
+
+    if (signUpError) {
+      setError(
+        signUpError.message.includes('already registered')
+          ? 'Dit e-mailadres is al in gebruik.'
+          : signUpError.message
+      )
+      setLoading(false)
+      return
+    }
+
     setDone(true)
     setLoading(false)
   }
@@ -31,7 +63,7 @@ export default function AanmeldenPage() {
         <div className="text-center max-w-md">
           <div className="font-display text-5xl tracking-widest text-fp-red mb-3">JE STAAT OP DE LIJST</div>
           <p className="font-mono text-[11px] tracking-widest uppercase text-fp-muted mb-8">
-            Welkom bij feestjepakken · check je e-mail om te verifiëren
+            Check je e-mail om je account te bevestigen
           </p>
           <Link href="/" className="font-mono text-[11px] tracking-widest uppercase px-8 py-3 bg-fp-red text-white hover:bg-red-500 transition-colors">
             Terug naar home
@@ -123,6 +155,10 @@ export default function AanmeldenPage() {
             <Field label="Over jezelf">
               <textarea name="bio" rows={3} placeholder="Wat voor type ben je? Waar ben je naar op zoek?" />
             </Field>
+
+            {error && (
+              <p className="font-mono text-[11px] text-fp-red tracking-wide">{error}</p>
+            )}
 
             <button
               type="submit"
