@@ -67,7 +67,7 @@ export interface Uitje {
   locatie: string
   provincie: string | null
   max_personen: number
-  leeftijdscategorie: LeeftijdCategorie
+  leeftijdscategorie: LeeftijdCategorie[]
   omvang: Omvang
   deelname_voorkeur: DeelnameVoorkeur
   actief: boolean

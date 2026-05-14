@@ -29,7 +29,7 @@ type UitjeRow = {
   locatie: string
   provincie: string | null
   omvang: Omvang
-  leeftijdscategorie: LeeftijdCategorie
+  leeftijdscategorie: LeeftijdCategorie[]
   deelname_voorkeur: DeelnameVoorkeur
   created_at: string
   users: { naam: string; leeftijd: number; woonplaats: string } | null
@@ -37,13 +37,13 @@ type UitjeRow = {
 
 type Filters = {
   type: UitjeType | 'all'
-  leeftijd: LeeftijdCategorie | 'all'
+  leeftijd: LeeftijdCategorie[]   // leeg = alle categorieën
   omvang: Omvang | 'all'
   deelname: DeelnameVoorkeur | 'all'
   provincie: string | 'all'
 }
 
-const INIT_FILTERS: Filters = { type: 'all', leeftijd: 'all', omvang: 'all', deelname: 'all', provincie: 'all' }
+const INIT_FILTERS: Filters = { type: 'all', leeftijd: [], omvang: 'all', deelname: 'all', provincie: 'all' }
 
 export default function UitjesPage() {
   const supabase = useMemo(() => createClient(), [])
@@ -73,7 +73,8 @@ export default function UitjesPage() {
   const gefilterd = useMemo(() => {
     return uitjes.filter(u => {
       if (filters.type !== 'all' && u.type !== filters.type) return false
-      if (filters.leeftijd !== 'all' && u.leeftijdscategorie !== filters.leeftijd) return false
+      // array-overlap: uitje verschijnt als minimaal één van zijn categorieën in de filter zit
+      if (filters.leeftijd.length > 0 && !u.leeftijdscategorie.some(c => filters.leeftijd.includes(c))) return false
       if (filters.omvang !== 'all' && u.omvang !== filters.omvang) return false
       if (filters.deelname !== 'all' && u.deelname_voorkeur !== filters.deelname) return false
       if (filters.provincie !== 'all' && u.provincie !== filters.provincie) return false
@@ -85,7 +86,19 @@ export default function UitjesPage() {
     setFilters(prev => ({ ...prev, [key]: val }))
   }
 
-  const actieveFilters = Object.values(filters).filter(v => v !== 'all').length
+  function toggleLeeftijd(cat: LeeftijdCategorie) {
+    setFilters(prev => {
+      const has = prev.leeftijd.includes(cat)
+      return { ...prev, leeftijd: has ? prev.leeftijd.filter(c => c !== cat) : [...prev.leeftijd, cat] }
+    })
+  }
+
+  const actieveFilters =
+    (filters.type !== 'all' ? 1 : 0) +
+    filters.leeftijd.length +
+    (filters.omvang !== 'all' ? 1 : 0) +
+    (filters.deelname !== 'all' ? 1 : 0) +
+    (filters.provincie !== 'all' ? 1 : 0)
 
   return (
     <main style={{ minHeight: '100vh', background: '#FAF7F4' }}>
@@ -121,9 +134,9 @@ export default function UitjesPage() {
         </FilterRow>
 
         <FilterRow label="Leeftijd">
-          <Pill active={filters.leeftijd === 'all'} onClick={() => setFilter('leeftijd', 'all')}>Alle leeftijden</Pill>
+          <Pill active={filters.leeftijd.length === 0} onClick={() => setFilter('leeftijd', [])}>Alle</Pill>
           {LEEFTIJD_CATEGORIEEN.map(c => (
-            <Pill key={c.value} active={filters.leeftijd === c.value} onClick={() => setFilter('leeftijd', c.value)}>
+            <Pill key={c.value} active={filters.leeftijd.includes(c.value)} onClick={() => toggleLeeftijd(c.value)}>
               {c.label}
             </Pill>
           ))}
@@ -218,7 +231,9 @@ function UitjeCard({ uitje }: { uitje: UitjeRow }) {
 
         {/* Tags */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginBottom: '0.9rem' }}>
-          <Tag>{LEEFTIJD_MAP[uitje.leeftijdscategorie]}</Tag>
+          {uitje.leeftijdscategorie.map(cat => (
+            <Tag key={cat}>{LEEFTIJD_MAP[cat] ?? cat}</Tag>
+          ))}
           <Tag>{OMVANG_MAP[uitje.omvang]}</Tag>
           {uitje.deelname_voorkeur !== 'iedereen' && <Tag accent>{DEELNAME_MAP[uitje.deelname_voorkeur]}</Tag>}
         </div>
